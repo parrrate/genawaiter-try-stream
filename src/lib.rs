@@ -13,7 +13,7 @@ impl<T, E> Co<T, E> {
 
 pub fn to_try_stream<T: Send, E: Send, F: Send + TryFuture<Output = Result<(), E>>>(
     f: impl Send + FnOnce(Co<T, E>) -> F,
-) -> impl Send + Stream<Item = Result<T, E>> {
+) -> impl Unpin + Send + Stream<Item = Result<T, E>> {
     Gen::new(async |co| {
         let co = Arc::new(co);
         if let Err(e) = f(Co(co.clone())).await {
